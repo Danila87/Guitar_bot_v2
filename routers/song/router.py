@@ -40,9 +40,17 @@ async def get_songs_by_category():
 
 
 @song_router.get('/songs', tags=['song'])
-async def get_songs() -> dict:
+async def get_songs() -> list[dict]:
 
     songs = await db.get_all_data(model=models.Songs)
+
+    return songs
+
+
+@song_router.get('/songs/{title_song}', tags=['song'])
+async def search_songs_by_title(title_song: str):
+
+    songs = await Query.search_all_songs_by_title(title_song=title_song)
 
     return songs
 

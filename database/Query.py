@@ -1,14 +1,14 @@
-from typing import Union
+from __future__ import annotations
 
-from .models import CategorySong
+from .models import CategorySong, Songs
 from .connection import db_session
 
 from sqlalchemy import select
-
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import selectinload, joinedload
 
 from fastapi.encoders import jsonable_encoder
+
+from fuzzywuzzy import fuzz
 
 
 class Query:
@@ -53,7 +53,7 @@ class Query:
             return True
 
     @staticmethod
-    async def get_data_by_filter(model, verify: bool = False, **kwargs) -> Union[dict, bool]:
+    async def get_data_by_filter(model, verify: bool = False, **kwargs) -> dict | bool:
 
         async with db_session() as session:
 
@@ -98,3 +98,27 @@ class Query:
             result = result.scalars().all()
 
             return jsonable_encoder(result)
+
+    @staticmethod
+    async def search_all_songs_by_title(title_song: str) -> list[str] | bool:
+
+        all_songs = await Query.get_all_data(model=Songs)
+        result_songs = []
+
+        for song in all_songs:
+
+            if fuzz.WRatio(song['title'], title_song) < 75:
+
+                continue
+
+            result_songs.append(
+                {
+                    'id_song': song['id'],
+                    'title_song': song['title']
+                }
+            )
+
+        if not result_songs:
+            return False
+
+        return result_songs
