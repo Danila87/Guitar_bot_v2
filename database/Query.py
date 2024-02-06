@@ -100,7 +100,7 @@ class Query:
             return jsonable_encoder(result)
 
     @staticmethod
-    async def search_all_songs_by_title(title_song: str) -> list[str] | bool:
+    async def search_all_songs_by_title(title_song: str) -> list[dict] | bool:
 
         all_songs = await Query.get_all_data(model=Songs)
         result_songs = []
