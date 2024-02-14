@@ -8,13 +8,15 @@ from database.Query import Query as db
 import datetime
 
 router_service = APIRouter(
-    prefix='service',
+    prefix='/service',
     tags=['service']
 )
 
 
 @router_service.post('/request')
-async def request(data: schemes.RequestSong):
+async def request(data: schemes.RequestSong, user: schemes.User):
+
+    await check_user(user=user)
 
     if await db.insert_data(model=models.Requests,
                             user_id=data.user_id,
