@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from pydantic_schemes.schemes import *
@@ -73,9 +75,11 @@ async def insert_song(song: Song = Depends(verify_song)):
 
 
 @song_router.get('/song/{song_id}', tags=['song'])
-async def get_song(song_id: int) -> dict:
+async def get_song(song_id: int) -> dict | bool:
 
     song = await db.get_data_by_id(model=models.Songs, model_id=song_id)
+    if not song:
+        raise HTTPException(status_code=400, detail='Песни не существует')
 
     return song
 

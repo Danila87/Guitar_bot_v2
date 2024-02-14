@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, field_validator
 
 from database.Query import Query
@@ -25,3 +27,20 @@ class Song(BaseModel):
 class CategorySong(BaseModel):
 
     category: str
+
+
+class RequestSong(BaseModel):
+
+    user_id: int
+    song_id: int
+
+    date: datetime
+
+
+class User(BaseModel):
+
+    telegram_id: int
+
+    first_name: str = None
+    last_name: str = None
+    nickname: str

@@ -26,14 +26,17 @@ class Query:
             return jsonable_encoder(data)
 
     @staticmethod
-    async def get_data_by_id(model, model_id: int, encode: bool = True,) -> dict:
+    async def get_data_by_id(model, model_id: int, encode: bool = True,) -> dict | bool:
 
         async with db_session() as session:
 
             query = select(model).filter(model.id == model_id)
 
             result = await session.execute(query)
-            data = result.scalars().one()
+            data = result.scalar_one_or_none()
+
+            if not data:
+                return False
 
             if encode:
                 return jsonable_encoder(data)
@@ -100,7 +103,7 @@ class Query:
             return jsonable_encoder(result)
 
     @staticmethod
-    async def search_all_songs_by_title(title_song: str) -> list[str] | bool:
+    async def search_all_songs_by_title(title_song: str) -> list[dict] | bool:
 
         all_songs = await Query.get_all_data(model=Songs)
         result_songs = []
